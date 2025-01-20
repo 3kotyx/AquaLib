@@ -28,11 +28,8 @@ namespace AquaLib
 
         private void Awake()
         {
-            // set project-scoped logger instance
+            // Set project-scoped logger instance
             Logger = base.Logger;
-
-            // Create a MoonSharp script engine
-            
 
             // Create a "Player" namespace (a table) and add functions to it
             DynValue playerNamespace = DynValue.NewTable(script);
@@ -56,32 +53,6 @@ namespace AquaLib
             modDirectory = Path.GetDirectoryName(Assembly.Location);
             luaScriptsDirectory = Path.Combine(modDirectory, "Lua");
 
-            //// Ensure the directory exists
-            //if (Directory.Exists(luaScriptsDirectory))
-            //{
-            //    // Get all Lua files in the directory
-            //    string[] luaFiles = Directory.GetFiles(luaScriptsDirectory, "*.lua");
-
-            //    // Loop through each Lua file and execute it
-            //    foreach (string luaFile in luaFiles)
-            //    {
-            //        try
-            //        {
-            //            Logger.LogInfo($"Running Lua script: {luaFile}");
-            //            string scriptContent = File.ReadAllText(luaFile);
-            //            script.DoString(scriptContent);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Logger.LogError($"Failed to execute Lua script '{luaFile}': {ex.Message}");
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    Logger.LogWarning($"Lua script directory not found: {luaScriptsDirectory}");
-            //}
-
             // Initialize custom prefabs
             InitializePrefabs();
 
@@ -89,18 +60,47 @@ namespace AquaLib
             Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
+
         private void Update()
         {
-            // Detect button press (e.g., "F12" key or any other button)
-            if (Input.GetKeyDown(KeyCode.F9)) {
-                Debug.Log("Current Scene:" + SceneManager.GetActiveScene().name);
+            // Detect button press (e.g., "F9" key or any other button)
+            if (Input.GetKeyDown(KeyCode.F9))
+            {
+                Debug.Log("Current Scene: " + SceneManager.GetActiveScene().name);
             }
+
+            // Only run Lua scripts in the "Main" scene
             if (SceneManager.GetActiveScene().name == "Main" && !IsIngame)
             {
                 RunLua();
                 IsIngame = true;
             }
+            else if (SceneManager.GetActiveScene().name != "Main" && IsIngame)
+            {
+                IsIngame = false; // Reset when leaving the "Main" scene
+            }
+
+            // Continuously call Lua's GameUpdate function if it exists
+            if (IsIngame)
+            {
+                // Check for a function called "GameUpdate" in Lua and call it
+                var luaUpdate = script.Globals.Get("GameUpdate");
+                if (luaUpdate != null && luaUpdate.Type == DataType.Function)
+                {
+                    try
+                    {
+                        // Call the Lua function (if it exists)
+                        script.Call(luaUpdate);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError($"Error during Lua GameUpdate execution: {ex.Message}");
+                    }
+                }
+            }
         }
+
+
         private void RunLua()
         {
             // Ensure the directory exists
@@ -123,15 +123,23 @@ namespace AquaLib
                         Logger.LogError($"Failed to execute Lua script '{luaFile}': {ex.Message}");
                     }
                 }
+
+                // Optionally: Initialize any Lua Update function that should be called continuously
+                var luaUpdate = script.Globals.Get("GameUpdate");
+                if (luaUpdate == null || luaUpdate.Type != DataType.Function)
+                {
+                    Logger.LogWarning("No Lua 'GameUpdate' function defined in the scripts.");
+                }
             }
             else
             {
                 Logger.LogWarning($"Lua script directory not found: {luaScriptsDirectory}");
             }
         }
+
         private void InitializePrefabs()
         {
-            //YeetKnifePrefab.Register();
+            // YeetKnifePrefab.Register();
         }
     }
 }

@@ -35,6 +35,10 @@ namespace AquaLib
             DynValue playerNamespace = DynValue.NewTable(script);
             script.Globals["Player"] = playerNamespace;
 
+            // Create a "Player" namespace (a table) and add functions to it
+            DynValue PdaEncyNamespace = DynValue.NewTable(script);
+            script.Globals["PdaDatabank"] = PdaEncyNamespace;
+
             // Add a function to the "Player" namespace
             playerNamespace.Table["GetHealth"] = (Func<float>)(() =>
             {
@@ -44,6 +48,11 @@ namespace AquaLib
             {
                 Player.main.liveMixin.health = health;
                 Console.WriteLine($"Player health set to: {health}");
+            });
+
+            PdaEncyNamespace.Table["RegisterEntry"] = (Action<string, string, string, string>)((key, path, title, desc) =>
+            {
+                Nautilus.Handlers.PDAHandler.AddEncyclopediaEntry(key, path, title, desc);
             });
 
             // Add a custom C# function

@@ -7,6 +7,8 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using MoonSharp.Interpreter;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace AquaLib
 {
@@ -81,7 +83,13 @@ namespace AquaLib
             Harmony.CreateAndPatchAll(Assembly, $"{PluginInfo.PLUGIN_GUID}");
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
-
+        private void Update()
+        {
+            // Detect button press (e.g., "F12" key or any other button)
+            if (Input.GetKeyDown(KeyCode.F9)) {
+                SceneManager.GetActiveScene();
+            }
+        }
         private void InitializePrefabs()
         {
             //YeetKnifePrefab.Register();

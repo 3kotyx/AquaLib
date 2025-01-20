@@ -26,6 +26,21 @@ namespace AquaLib
             // Create a MoonSharp script engine
             Script script = new Script();
 
+            // Create a "Player" namespace (a table) and add functions to it
+            DynValue playerNamespace = DynValue.NewTable(script);
+            script.Globals["Player"] = playerNamespace;
+
+            // Add a function to the "Player" namespace
+            playerNamespace.Table["GetHealth"] = (Func<float>)(() =>
+            {
+                return Player.main.liveMixin.health;
+            });
+            playerNamespace.Table["SetHealth"] = (Action<float>)((health) =>
+            {
+                Player.main.liveMixin.health = health;
+                Console.WriteLine($"Player health set to: {health}");
+            });
+
             // Add a custom C# function
             script.Globals["UnityPrintMsg"] = (Action<string>)((msg) => Logger.LogInfo($"Lua: {msg}"));
 

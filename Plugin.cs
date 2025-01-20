@@ -103,13 +103,10 @@ namespace AquaLib
 
         private void RunLua()
         {
-            // Ensure the directory exists
             if (Directory.Exists(luaScriptsDirectory))
             {
-                // Get all Lua files in the directory
                 string[] luaFiles = Directory.GetFiles(luaScriptsDirectory, "*.lua");
 
-                // Loop through each Lua file and execute it
                 foreach (string luaFile in luaFiles)
                 {
                     try
@@ -123,19 +120,13 @@ namespace AquaLib
                         Logger.LogError($"Failed to execute Lua script '{luaFile}': {ex.Message}");
                     }
                 }
-
-                // Optionally: Initialize any Lua Update function that should be called continuously
-                var luaUpdate = script.Globals.Get("GameUpdate");
-                if (luaUpdate == null || luaUpdate.Type != DataType.Function)
-                {
-                    Logger.LogWarning("No Lua 'GameUpdate' function defined in the scripts.");
-                }
             }
             else
             {
                 Logger.LogWarning($"Lua script directory not found: {luaScriptsDirectory}");
             }
         }
+
 
         private void InitializePrefabs()
         {

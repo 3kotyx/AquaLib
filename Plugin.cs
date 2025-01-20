@@ -48,6 +48,8 @@ namespace AquaLib
 
             // Add a custom C# function
             script.Globals["UnityPrintMsg"] = (Action<string>)((msg) => Logger.LogInfo($"Lua: {msg}"));
+            // Add a custom C# function
+            script.Globals["ExitGame"] = (Action)(() => Application.Quit());
 
             // Run Lua scripts from the "Lua" directory in the mod's folder
             modDirectory = Path.GetDirectoryName(Assembly.Location);

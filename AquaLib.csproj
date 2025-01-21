@@ -15,6 +15,8 @@
 		  https://nuget.bepinex.dev/v3/index.json;
 	  </RestoreAdditionalProjectSources>
   </PropertyGroup>
+	
+	<!-- Remove the stuff related to the copying - wont work on any other computer !-->
 	<!--Imports the GameDir.targets file (from the same folder) which should contain the path to the Subnautica directory for the post-build event-->
 	<Import Project="GameDir.targets" />
 
